@@ -424,20 +424,26 @@ func (h *PaymentHandler) notify(orderNo string, tradeNo string) error {
 
 	var opt string
 	var power int
+	//充值不再有点卡的概念，一律以算力Power来充值，VIP会员在有效期内使用期算力，有效期内算力用尽，需要再额外购买算力20240525
+	//VIP充值：有限时间段内使用其获得的相应算力
+	//算力充值：没有时间限制，用完为止
 	if remark.Days > 0 { // VIP 充值
-		if user.ExpiredTime >= time.Now().Unix() {
-			user.ExpiredTime = time.Unix(user.ExpiredTime, 0).AddDate(0, 0, remark.Days).Unix()
-			opt = "VIP充值，VIP 没到期，只延期不增加算力"
-		} else {
-			user.ExpiredTime = time.Now().AddDate(0, 0, remark.Days).Unix()
-			user.Power += h.App.SysConfig.VipMonthPower
-			power = h.App.SysConfig.VipMonthPower
-			opt = "VIP充值"
-		}
-		user.Vip = true
-	} else { // 充值点卡，直接增加次数即可
+		// if user.ExpiredTime >= time.Now().Unix() {
+		// 	user.ExpiredTime = time.Unix(user.ExpiredTime, 0).AddDate(0, 0, remark.Days).Unix()
+		// 	opt = "VIP充值，VIP 没到期，只延期不增加算力"
+		// } else {
+		// 	user.ExpiredTime = time.Now().AddDate(0, 0, remark.Days).Unix()
+		// 	user.Power += h.App.SysConfig.VipMonthPower
+		// 	power = h.App.SysConfig.VipMonthPower
+		// 	opt = "VIP充值"
+		// }
 		user.Power += remark.Power
-		opt = "点卡充值"
+		opt = "VIP充值"
+		power = remark.Power
+		user.Vip = true
+	} else { // 充值算力，直接增加算力
+		user.Power += remark.Power
+		opt = "算力充值"
 		power = remark.Power
 	}
 
