@@ -434,8 +434,8 @@ func (h *PaymentHandler) notify(orderNo string, tradeNo string) error {
 			opt = "VIP充值，VIP 没到期，只延期不增加算力"
 		} else {
 			user.ExpiredTime = time.Now().AddDate(0, 0, remark.Days).Unix()
-			user.Power += config.VipMonthPower
-			power = config.VipMonthPower
+			user.Power += . h.App.SysConfig.VipMonthPower
+			power =  h.App.SysConfig.VipMonthPower
 			opt = "VIP充值"
 		}
 		power = remark.Power
