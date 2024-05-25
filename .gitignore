@@ -17,4 +17,3 @@ logs
 deploy/
 deploy/conf/mj-proxy/application.yml
 deploy/conf/config.toml
-deploy/conf/config.toml
