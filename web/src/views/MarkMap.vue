@@ -110,16 +110,29 @@ const leftBoxHeight = ref(window.innerHeight - 105)
 const rightBoxHeight = ref(window.innerHeight - 85)
 
 const prompt = ref("")
-const text = ref(`# Geek-AI 助手
+const text = ref(`# 未来AI教育的发展方向
 
-- 完整的开源系统，前端应用和后台管理系统皆可开箱即用。
-- 基于 Websocket 实现，完美的打字机体验。
-- 内置了各种预训练好的角色应用,轻松满足你的各种聊天和应用需求。
-- 支持 OPenAI，Azure，文心一言，讯飞星火，清华 ChatGLM等多个大语言模型。
-- 支持 MidJourney / Stable Diffusion AI 绘画集成，开箱即用。
-- 支持使用个人微信二维码作为充值收费的支付渠道，无需企业支付通道。
-- 已集成支付宝支付功能，微信支付，支持多种会员套餐和点卡购买功能。
-- 集成插件 API 功能，可结合大语言模型的 function 功能开发各种强大的插件。
+## 一、个性化学习
+#### 自适应学习系统
+#### 智能推荐系统
+#### 虚拟导师
+## 二、智能评价
+### 利用AI技术对学生的作业、测试和表现进行自动评价，并提供详细的反馈和建议。
+#### 自动批改系统
+#### 智能考试系统
+#### 学习分析系统
+## 三、沉浸式学习
+#### VR/AR模拟
+#### 游戏化学习
+#### 3D打印学习
+## 四、终身学习
+### 利用AI技术为每个人提供个性化的终身学习机会，帮助人们持续学习和发展。
+#### 微型学习平台
+#### 知识管理系统
+#### 智能推荐系统
+## 五、AI教育伦理
+### 探讨AI教育中的伦理问题，例如数据隐私、算法偏见和公平性等。
+### 制定相关政策和规范，确保AI教育的健康发展。
 `)
 const md = require('markdown-it')({breaks: true});
 const content = ref(text.value)

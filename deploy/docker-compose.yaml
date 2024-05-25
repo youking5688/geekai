@@ -9,12 +9,12 @@ services:
     environment:
       - MYSQL_ROOT_PASSWORD=12345678
     ports:
-      - "3307:3306"
+      - "3306:3306"
     volumes :
       - ./conf/mysql/my.cnf:/etc/mysql/my.cnf
       - ./data/mysql/data:/var/lib/mysql
       - ./logs/mysql:/var/log/mysql
-      - ./data/mysql/init.d:/docker-entrypoint-initdb.d/
+      # - ./data/mysql/init.d:/docker-entrypoint-initdb.d/
 
   # redis
   geekai-redis:
@@ -25,7 +25,7 @@ services:
     volumes :
       - ./data/redis:/data
     ports:
-      - "6380:6379"
+      - "6379:6379"
 
   xxl-job-admin:
     container_name: xxl-job-admin
@@ -53,15 +53,15 @@ services:
 
   # 后端 API 程序
   geekai-api:
-    image: registry.cn-shenzhen.aliyuncs.com/geekmaster/geekai-api:v4.0.7-amd64
+    image: baizeai/baize-geekai-api:v1.0.5-amd64
     container_name: geekai-api
     restart: always
     depends_on:
       - geekai-mysql
       - geekai-redis
     environment:
-      - DEBUG=false
-      - LOG_LEVEL=info
+      - DEBUG=true
+      - LOG_LEVEL=DEBUG
       - CONFIG_FILE=config.toml
     ports:
       - "5678:5678"
@@ -72,10 +72,11 @@ services:
       - ./logs/app:/var/www/app/logs
       - ./static:/var/www/app/static
       - ./data/leveldb:/var/www/app/data
+      - ./certs:/var/www/app/certs
 
   # 前端应用
   geekai-web:
-    image: registry.cn-shenzhen.aliyuncs.com/geekmaster/geekai-web:v4.0.7-amd64
+    image: baizeai/baize-geekai-web:v1.0.5-amd64
     container_name: geekai-web
     restart: always
     depends_on:
@@ -87,4 +88,6 @@ services:
       - ./conf/nginx/conf.d:/etc/nginx/conf.d
       - ./conf/nginx/nginx.conf:/etc/nginx/nginx.conf
       - ./conf/nginx/ssl:/etc/nginx/ssl
+      - /etc/letsencrypt/live/ai.nextv.show/fullchain.pem:/var/www/app/certs/ai.nextv.show.pem
+      - /etc/letsencrypt/live/ai.nextv.show/privkey.pem:/var/www/app/certs/ai.nextv.show.key
 

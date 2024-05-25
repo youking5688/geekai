@@ -52,7 +52,7 @@ import {setAdminToken} from "@/store/session";
 import {checkAdminSession} from "@/action/session";
 
 const router = useRouter();
-const title = ref('ChatGPT Plus Admin');
+const title = ref('白泽AI 智作系统');
 const username = ref(process.env.VUE_APP_ADMIN_USER);
 const password = ref(process.env.VUE_APP_ADMIN_PASS);
 

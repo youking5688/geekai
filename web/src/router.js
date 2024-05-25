@@ -98,7 +98,7 @@ const routes = [
     {
         path: '/admin/login',
         name: 'admin-login',
-        meta: {title: 'ChatPuls 控制台登录'},
+        meta: {title: '控制台登录'},
         component: () => import('@/views/admin/Login.vue'),
     },
     {
@@ -106,7 +106,7 @@ const routes = [
         path: '/admin',
         redirect: '/admin/dashboard',
         component: () => import("@/views/admin/Home.vue"),
-        meta: {title: 'ChatPuls 管理后台'},
+        meta: {title: '管理后台'},
         children: [
             {
                 path: '/admin/dashboard',
@@ -199,7 +199,7 @@ const routes = [
     {
         name: 'mobile',
         path: '/mobile',
-        meta: {title: 'Geek-AI v4.0'},
+        meta: {title: ''},
         component: () => import('@/views/mobile/Home.vue'),
         redirect: '/mobile/chat',
         children: [
