@@ -27,7 +27,7 @@ const canSend = ref(true)
 // 发送短信验证码
 const sendMsg = () => {
   if (!validateMobile(props.receiver) && !validateEmail(props.receiver)) {
-    return ElMessage.error("请输入合法的手机号/邮箱地址")
+    return showMessageError("请输入合法的手机号/邮箱地址")
   }
 
   if (!canSend.value) {
@@ -51,7 +51,7 @@ const sendMsg = () => {
     }, 1000)
   }).catch(e => {
     canSend.value = true
-    ElMessage.error('验证码发送失败：' + e.message)
+    showMessageError('验证码发送失败：' + e.message)
   })
 }
 </script>

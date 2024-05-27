@@ -1,5 +1,6 @@
 <template>
-  <div class="index-page" :style="{height: winHeight + 'px'}">
+  <div class="index-page" :style="{height: winHeight+'px'}">
+    <div class="bg"></div>
     <div class="menu-box">
       <el-menu mode="horizontal" :ellipsis="false">
         <div class="menu-item">
@@ -7,10 +8,8 @@
           <div class="title">{{ title }}</div>
         </div>
         <div class="menu-item">
-          <el-button @click="() => router.push('/login')" style="color:#007bff" :dark="false">
-            <i class="iconfont icon-book"></i>
-            <span>登录</span>
-          </el-button>
+          <el-button @click="router.push('/login')" round>登录</el-button>
+          <el-button @click="router.push('/register')" round>注册</el-button>
         </div>
       </el-menu>
     </div>
@@ -19,20 +18,21 @@
       <p>{{ slogan }}</p>
       <el-button @click="() => router.push('/chat')" style="color:#007bff" :dark="false">
         <i class="iconfont icon-chat"></i>
-        <span>AI聊天</span>
+        <span>AI 对话</span>
       </el-button>
       <el-button @click="() => router.push('/mj')" style="color:#424282" :dark="false">
         <i class="iconfont icon-mj"></i>
-        <span>AI-MJ绘画</span>
+        <span>MJ 绘画</span>
       </el-button>
       <el-button @click="() => router.push('/sd')" style="color:#424282" :dark="false">
         <i class="iconfont icon-sd"></i>
-        <span>AI-SD绘画</span>
+        <span>SD 绘画</span>
       </el-button>
       <el-button @click="() => router.push('/xmind')" style="color:#424282" :dark="false">
         <i class="iconfont icon-xmind"></i>
         <span>思维导图</span>
       </el-button>
+      <!--      <div id="animation-container"></div>-->
     </div>
     <div class="footer">
       <footer-bar />
@@ -41,46 +41,117 @@
 </template>
 
 <script setup>
-import { onMounted, ref } from 'vue';
-import { useRouter } from 'vue-router';
-import FooterBar from '@/components/FooterBar.vue';
-import { httpGet } from '@/utils/http';
-import { ElMessage } from 'element-plus';
 
-const router = useRouter();
+// import * as THREE from 'three';
+import {onMounted, ref} from "vue";
+import {useRouter} from "vue-router";
+import FooterBar from "@/components/FooterBar.vue";
+import {httpGet} from "@/utils/http";
+import {ElMessage} from "element-plus";
+import {isMobile} from "@/utils/libs";
 
-const title = ref("白泽AI 智作系统");
-const logo = ref("/images/logo.png");
-const slogan = ref("融顶尖技术，绘未来生活");
-const winHeight = ref(window.innerHeight - 150);
+const router = useRouter()
+
+if (isMobile()) {
+  router.push("/mobile")
+}
+
+const title = ref("白泽AI 智作系统")
+const logo = ref("/images/logo.png")
+const slogan = ref("融顶尖技术，绘未来生活")
+// const size = Math.max(window.innerWidth * 0.5, window.innerHeight * 0.8)
+const winHeight = window.innerHeight - 150
 
 onMounted(() => {
-  httpGet("/api/config/get?key=system")
-    .then(res => {
-      title.value = res.data.title;
-      logo.value = res.data.logo;
-    })
-    .catch(e => {
-      ElMessage.error("获取系统配置失败：" + e.message);
-    });
-});
+  httpGet("/api/config/get?key=system").then(res => {
+    title.value = res.data.title
+    logo.value = res.data.logo
+  }).catch(e => {
+    ElMessage.error("获取系统配置失败：" + e.message)
+  })
+  init()
+})
+
+const init = () => {
+  // // 创建场景
+  // // 创建场景
+  // const scene = new THREE.Scene();
+  //
+  // // 创建相机
+  // const camera = new THREE.PerspectiveCamera(30, 1, 0.1, 1000);
+  // camera.position.z = 3.88;
+  //
+  // // 创建渲染器
+  // const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
+  // renderer.setSize(size, size);
+  // renderer.setClearColor(0x000000, 0);
+  // const container = document.getElementById('animation-container');
+  // container.appendChild(renderer.domElement);
+  //
+  // // 加载地球纹理
+  // const loader = new THREE.TextureLoader();
+  // loader.load(
+  //     '/images/land_ocean_ice_cloud_2048.jpg',
+  //     function (texture) {
+  //       // 创建地球球体
+  //       const geometry = new THREE.SphereGeometry(1, 32, 32);
+  //       const material = new THREE.MeshPhongMaterial({
+  //         map: texture,
+  //         bumpMap: texture, // 使用同一张纹理作为凹凸贴图
+  //         bumpScale: 0.05, // 调整凹凸贴图的影响程度
+  //         specularMap: texture, // 高光贴图
+  //         specular: new THREE.Color('#01193B'), // 高光颜色
+  //       });
+  //       const earth = new THREE.Mesh(geometry, material);
+  //       scene.add(earth);
+  //
+  //       // 添加环境光和点光源
+  //       const ambientLight = new THREE.AmbientLight(0xffffff, 0.3);
+  //       scene.add(ambientLight);
+  //       const pointLight = new THREE.PointLight(0xffffff, 0.8);
+  //       pointLight.position.set(5, 5, 5);
+  //       scene.add(pointLight);
+  //
+  //       // 创建动画
+  //       const animate = function () {
+  //         requestAnimationFrame(animate);
+  //
+  //         // 使地球自转和公转
+  //         earth.rotation.y += 0.0006;
+  //
+  //         renderer.render(scene, camera);
+  //       };
+  //
+  //       // 执行动画
+  //       animate();
+  //     }
+  // );
+}
 </script>
 
 <style lang="stylus" scoped>
 @import '@/assets/iconfont/iconfont.css';
 
 .index-page {
-  margin: 0;
-  background-image: url('@/assets/img/ai-bg.jpg');
-  background-size: cover;
-  background-position-x: 50%;
-  background-position-y: center;
-  overflow: hidden;
-  color: #ffffff;
-  display: flex;
-  justify-content: center;
-  align-items: baseline;
-  padding-top: 150px;
+  margin: 0
+  overflow hidden
+  color #ffffff
+  display flex
+  justify-content center
+  align-items baseline
+  padding-top 150px
+
+  .bg {
+    position absolute
+    top 0
+    left 0
+    width 100vw
+    height 100vh
+    background-image url("~@/assets/img/ai-bg.jpg")
+    //filter: blur(8px);
+    background-size: cover;
+    background-position: center;
+  }
 
   .menu-box {
     position: absolute;
