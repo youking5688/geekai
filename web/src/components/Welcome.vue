@@ -21,20 +21,6 @@
         <el-col :span="8">
           <div class="grid-content">
             <div class="item-title">
-              <div><i class="iconfont icon-plugin"></i></div>
-              <div>插件增强</div>
-            </div>
-
-            <div class="list-box">
-              <ul>
-                <li v-for="item in plugins" :key="item.value"><a @click="send(item.value)">{{ item.text }}</a></li>
-              </ul>
-            </div>
-          </div>
-        </el-col>
-        <el-col :span="8">
-          <div class="grid-content">
-            <div class="item-title">
               <div><i class="iconfont icon-control"></i></div>
               <div>能力扩展</div>
             </div>

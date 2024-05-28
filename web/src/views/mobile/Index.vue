@@ -2,7 +2,7 @@
   <div class="index container">
     <h2 class="title">{{title}}</h2>
     <van-notice-bar  left-icon="info-o" :scrollable="true">
-      你有多少想象力，AI就有多大创造力。我辈之人，先干为敬，陪您先把 AI 用起来。
+      你有多少想象力，AI就有多大创造力。白泽AI，陪您先把 AI 用起来。
     </van-notice-bar>
 
     <div class="content">

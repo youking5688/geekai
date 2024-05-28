@@ -354,11 +354,11 @@ onMounted(() => {
 })
 
 const fetchLicense = () => {
-  httpGet("/api/admin/config/get/license").then(res => {
-    license.value = res.data
-  }).catch(e => {
-    ElMessage.error("获取 License 失败：" + e.message)
-  })
+  // httpGet("/api/admin/config/get/license").then(res => {
+  license.value = "welcomeusebaizeai"
+  // }).catch(e => {
+    // ElMessage.error("获取 License 失败：" + e.message)
+  // })
 }
 
 const rules = reactive({
