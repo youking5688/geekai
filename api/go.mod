@@ -30,8 +30,8 @@ require (
 	github.com/mojocn/base64Captcha v1.3.1
 	github.com/shopspring/decimal v1.3.1
 	github.com/syndtr/goleveldb v1.0.0
-	golang.org/x/image v0.0.0-20211028202545-6944b10bf410
 	github.com/wechatpay-apiv3/wechatpay-go v0.2.18
+	golang.org/x/image v0.0.0-20211028202545-6944b10bf410
 )
 
 require (

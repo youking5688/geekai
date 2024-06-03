@@ -1,9 +1,9 @@
 package payment
 
 import (
-	"chatplus/core/types"
-	"chatplus/store/model"
-	chatPlusUtils "chatplus/utils"
+	"geekai/core/types"
+	"geekai/store/model"
+	chatPlusUtils "geekai/utils"
 	"context"
 	"github.com/gin-gonic/gin"
 	"github.com/wechatpay-apiv3/wechatpay-go/core/auth/verifiers"

@@ -107,7 +107,9 @@ func (e *XXLJobExecutor) ResetVipPower(cxt context.Context, param *xxl.RunReq) (
 			continue
 		}
 		// update user
-		tx := e.db.Model(&model.User{}).Where("id", u.Id).UpdateColumn("power", gorm.Expr("power + ?", config.VipMonthPower))
+		// tx := e.db.Model(&model.User{}).Where("id", u.Id).UpdateColumn("power", gorm.Expr("power + ?", config.VipMonthPower))
+		// 每月初将，将VIP会员的算力值恢复到初始值，该值为config.toml中配置的VipMonthPower
+		tx := e.db.Model(&model.User{}).Where("id", u.Id).UpdateColumn("power", config.VipMonthPower)
 		// 记录算力变动日志
 		if tx.Error == nil {
 			var user model.User
@@ -156,6 +158,13 @@ func (e *XXLJobExecutor) ResetUserPower(cxt context.Context, param *xxl.RunReq) 
 	var counter = 0
 	var totalPower = 0
 	for _, u := range users {
+		// 处理过期的 VIP，主要针对7天体验会员，每天检查一次
+		if u.ExpiredTime > 0 && u.ExpiredTime <= time.Now().Unix() {
+			u.Vip = false
+			e.db.Model(&model.User{}).Where("id", u.Id).UpdateColumn("vip", false)
+			continue
+		}
+		// 用户算力值足够则不用补充
 		if u.Power >= config.DailyPower {
 			continue
 		}
