@@ -8,8 +8,8 @@ services:
     restart: always
     environment:
       - MYSQL_ROOT_PASSWORD=12345678
-    ports:
-      - "3306:3306"
+    # ports:
+    #   - "3306:3306"
     volumes :
       - ./conf/mysql/my.cnf:/etc/mysql/my.cnf
       - ./data/mysql/data:/var/lib/mysql
@@ -53,7 +53,7 @@ services:
 
   # 后端 API 程序
   geekai-api:
-    image: baizeai/baize-geekai-api:v1.2.0-amd64
+    image: baizeai/baize-geekai-api:v2.0.0-amd64
     container_name: geekai-api
     restart: always
     depends_on:
@@ -76,7 +76,7 @@ services:
 
   # 前端应用
   geekai-web:
-    image: baizeai/baize-geekai-web:v1.2.0-amd64
+    image: baizeai/baize-geekai-web:v2.0.0-amd64
     container_name: geekai-web
     restart: always
     depends_on:

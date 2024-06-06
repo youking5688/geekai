@@ -465,3 +465,116 @@ func (h *UserHandler) BindUsername(c *gin.Context) {
 	_ = h.redis.Del(c, key) // 删除短信验证码
 	resp.SUCCESS(c)
 }
+
+
+// WeChatLogin 微信登录
+func (h *UserHandler) WeChatLogin(c *gin.Context) {
+
+		userAgent := c.Request.UserAgent()
+		var authURL string
+
+    // 微信授权回调的重定向 URL
+    redirectURI := "https://ai.nextv.show/callBack"
+    state := utils.RandString(16)
+		appId := h.App.Config.WxpayConfig.AppId
+    
+    // 构建微信授权 URL
+		if strings.Contains(userAgent, "Mobile") {
+				authURL = fmt.Sprintf(
+            "https://open.weixin.qq.com/connect/oauth2/authorize?appid=%s&redirect_uri=%s&response_type=code&scope=snsapi_userinfo&state=%s#wechat_redirect",
+            appId, redirectURI, state,
+        )
+		}else{
+    		authURL = fmt.Sprintf(
+						"https://open.weixin.qq.com/connect/qrconnect?appid=%s&redirect_uri=%s&response_type=code&scope=snsapi_login&state=%s#wechat_redirect",
+						appId, redirectURI, state,
+    )
+		}
+    
+    // 重定向用户到微信授权页面
+    // c.Redirect(302, weChatAuthURL)
+		resp.SUCCESS(c, authURL)
+}
+
+// WeChatCallback 微信授权回调处理
+func (h *UserHandler) WeChatCallback(c *gin.Context) {
+    code := c.Query("code")
+    state := c.Query("state")
+    
+    if code == "" || state == "" {
+        resp.ERROR(c, "缺少必要的参数")
+        return
+    }
+    
+    oauth2Endpoint := openoath.NewEndpoint(h.App.Config.WxpayConfig.AppId, h.App.Config.WxpayConfig.WxAppSecret)
+    oaClient := oauth2.Client{Endpoint: oauth2Endpoint}
+    oaToken, errToken := oaClient.ExchangeToken(code)
+    if errToken != nil {
+        logger.Error("errToken=", errToken)
+        resp.ERROR(c, "登录超时，请重试")
+        return
+    }
+    userinfo, err := openoath.GetUserInfo(oaToken.AccessToken, oaToken.OpenId, openoath.LanguageZhCN, nil)
+    if err != nil {
+        logger.Error("err=", err)
+        resp.ERROR(c, "用户信息获取失败，请重试")
+        return
+    }
+
+    // 根据微信用户信息进行用户注册或登录
+    var user model.User
+    res := h.DB.Where("official_openid = ?", userinfo.OpenId).First(&user)
+    if res.Error != nil && res.Error != gorm.ErrRecordNotFound {
+        resp.ERROR(c, "数据库查询失败")
+        return
+    }
+
+    if res.Error == gorm.ErrRecordNotFound {
+        // 新用户注册
+        user = model.User{
+            Username:      userinfo.Nickname,
+            OfficialOpenid: userinfo.OpenId,
+            Unionid:       userinfo.UnionId,
+            Nickname:      userinfo.Nickname,
+            // Avatar:        userinfo.HeadImgURL,
+            Salt:          utils.RandString(8),
+            Status:        true,
+            ChatRoles:     utils.JsonEncode([]string{"gpt"}),
+            ChatModels:    utils.JsonEncode(h.App.SysConfig.DefaultModels),
+            Power:         h.App.SysConfig.InitPower,
+        }
+        createRes := h.DB.Create(&user)
+        if createRes.Error != nil {
+            resp.ERROR(c, "用户注册失败")
+            return
+        }
+    }
+
+    // 更新最后登录时间和IP
+    updates := map[string]interface{}{
+        "last_login_ip": c.ClientIP(),
+        "last_login_at": time.Now().Unix(),
+    }
+    h.DB.Model(&user).Updates(updates)
+
+    // 创建 token
+    token := jwt.NewWithClaims(jwt.SigningMethodHS256, jwt.MapClaims{
+        "user_id": user.Id,
+        "expired": time.Now().Add(time.Second * time.Duration(h.App.Config.Session.MaxAge)).Unix(),
+    })
+    tokenString, err := token.SignedString([]byte(h.App.Config.Session.SecretKey))
+    if err != nil {
+        resp.ERROR(c, "Failed to generate token, "+err.Error())
+        return
+    }
+
+    // 保存到 redis
+    key := fmt.Sprintf("users/%d", user.Id)
+    if _, err := h.redis.Set(c, key, tokenString, 0).Result(); err != nil {
+        resp.ERROR(c, "error with save token: "+err.Error())
+        return
+    }
+
+    resp.SUCCESS(c, tokenString)
+}
+

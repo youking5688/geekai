@@ -235,6 +235,8 @@ func main() {
 			group.POST("password", h.UpdatePass)
 			group.POST("bind/username", h.BindUsername)
 			group.POST("resetPass", h.ResetPass)
+			group.GET("weChatLogin", h.WeChatLogin)
+			group.GET("weChatCallback", h.WeChatCallback)
 		}),
 		fx.Invoke(func(s *core.AppServer, h *chatimpl.ChatHandler) {
 			group := s.Engine.Group("/api/chat/")

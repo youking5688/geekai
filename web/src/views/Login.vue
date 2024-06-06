@@ -4,27 +4,25 @@
     <div class="main">
       <div class="contain">
         <div class="logo">
-          <el-image :src="logo" fit="cover" @click="router.push('/')"/>
+          <el-image :src="logo" fit="cover" @click="router.push('/')" />
         </div>
         <div class="header">{{ title }}</div>
         <div class="content">
           <div class="block">
-            <el-input placeholder="账号" size="large" v-model="username" autocomplete="off" autofocus
-                      @keyup="handleKeyup">
+            <el-input placeholder="账号" size="large" v-model="username" autocomplete="off" autofocus @keyup="handleKeyup">
               <template #prefix>
                 <el-icon>
-                  <UserFilled/>
+                  <UserFilled />
                 </el-icon>
               </template>
             </el-input>
           </div>
 
           <div class="block">
-            <el-input placeholder="密码" size="large" v-model="password" show-password autocomplete="off"
-                      @keyup="handleKeyup">
+            <el-input placeholder="密码" size="large" v-model="password" show-password autocomplete="off" @keyup="handleKeyup">
               <template #prefix>
                 <el-icon>
-                  <Lock/>
+                  <Lock />
                 </el-icon>
               </template>
             </el-input>
@@ -33,6 +31,9 @@
           <el-row class="btn-row">
             <el-button class="login-btn" size="large" type="primary" @click="login">登录</el-button>
           </el-row>
+          <!-- <el-row class="btn-row">
+            <el-button class="login-btn" size="large" type="primary" @click="wxLogin">微信登录</el-button>
+          </el-row> -->
 
           <el-row class="opt" :gutter="20">
             <el-col :span="8"><el-link type="primary" @click="router.push('/register')">注册</el-link></el-col>
@@ -42,80 +43,91 @@
         </div>
       </div>
 
-      <reset-pass @hide="showResetPass = false" :show="showResetPass"/>
+      <reset-pass @hide="showResetPass = false" :show="showResetPass" />
 
       <footer class="footer">
-        <footer-bar/>
+        <footer-bar />
       </footer>
     </div>
   </div>
 </template>
 
 <script setup>
+import { ref } from 'vue'
+import { Lock, UserFilled } from '@element-plus/icons-vue'
+import { httpGet, httpPost } from '@/utils/http'
+import { useRouter } from 'vue-router'
+import FooterBar from '@/components/FooterBar.vue'
+import { isMobile } from '@/utils/libs'
+import { checkSession } from '@/action/session'
+import { setUserToken } from '@/store/session'
+import ResetPass from '@/components/ResetPass.vue'
+import { showMessageError } from '@/utils/dialog'
 
-import {ref} from "vue";
-import {Lock, UserFilled} from "@element-plus/icons-vue";
-import {httpGet, httpPost} from "@/utils/http";
-import {useRouter} from "vue-router";
-import FooterBar from "@/components/FooterBar.vue";
-import {isMobile} from "@/utils/libs";
-import {checkSession} from "@/action/session";
-import {setUserToken} from "@/store/session";
-import ResetPass from "@/components/ResetPass.vue";
-import {showMessageError} from "@/utils/dialog";
-
-const router = useRouter();
-const title = ref('用户登录');
-const username = ref(process.env.VUE_APP_USER);
-const password = ref(process.env.VUE_APP_PASS);
+const router = useRouter()
+const title = ref('用户登录')
+const username = ref(process.env.VUE_APP_USER)
+const password = ref(process.env.VUE_APP_PASS)
 const showResetPass = ref(false)
-const logo = ref("/images/logo.png")
+const logo = ref('/images/logo.png')
 
 // 获取系统配置
-httpGet("/api/config/get?key=system").then(res => {
-  logo.value = res.data.logo
-  title.value = res.data.title
-}).catch(e => {
-  showMessageError("获取系统配置失败：" + e.message)
-})
+httpGet('/api/config/get?key=system')
+  .then((res) => {
+    logo.value = res.data.logo
+    title.value = res.data.title
+  })
+  .catch((e) => {
+    showMessageError('获取系统配置失败：' + e.message)
+  })
 
-
-checkSession().then(() => {
-  if (isMobile()) {
-    router.push('/mobile')
-  } else {
-    router.push('/chat')
-  }
-}).catch(() => {
-})
-
-const handleKeyup = (e) => {
-  if (e.key === 'Enter') {
-    login();
-  }
-};
-
-const login = function () {
-  if (username.value.trim() === '') {
-    return showMessageError("请输入用户民")
-  }
-  if (password.value.trim() === '') {
-    return showMessageError('请输入密码');
-  }
-
-  httpPost('/api/user/login', {username: username.value.trim(), password: password.value.trim()}).then((res) => {
-    setUserToken(res.data)
+checkSession()
+  .then(() => {
     if (isMobile()) {
       router.push('/mobile')
     } else {
       router.push('/chat')
     }
-
-  }).catch((e) => {
-    showMessageError('登录失败，' + e.message)
   })
+  .catch(() => {})
+
+const handleKeyup = (e) => {
+  if (e.key === 'Enter') {
+    login()
+  }
 }
 
+const login = function () {
+  if (username.value.trim() === '') {
+    return showMessageError('请输入用户民')
+  }
+  if (password.value.trim() === '') {
+    return showMessageError('请输入密码')
+  }
+
+  httpPost('/api/user/login', { username: username.value.trim(), password: password.value.trim() })
+    .then((res) => {
+      setUserToken(res.data)
+      if (isMobile()) {
+        router.push('/mobile')
+      } else {
+        router.push('/chat')
+      }
+    })
+    .catch((e) => {
+      showMessageError('登录失败，' + e.message)
+    })
+}
+const wxLogin = function () {
+  httpGet('/api/user/weChatLogin')
+    .then((res) => {
+      const weChatAuthURL = response.data.url
+      window.location.href = weChatAuthURL
+    })
+    .catch((e) => {
+      console.error('Error:', e)
+    })
+}
 </script>
 
 <style lang="stylus" scoped>
